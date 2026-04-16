@@ -8,6 +8,7 @@ import com.dauphine.blogger.services.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/v1/posts")
@@ -35,51 +37,44 @@ public class PostController {
 
     @GetMapping
     @Operation(summary = "Retrieve all posts ordered by creation date or filter by date/value")
-    public List<Post> getAll(
+    public ResponseEntity<List<Post>> getAll(
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date,
             @RequestParam(required = false) String value) {
-        return postService.getAll(date, value);
+        return ResponseEntity.ok(postService.getAll(date, value));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Retrieve a post by id")
     public ResponseEntity<Post> getById(@PathVariable UUID id) {
-        return postService.getById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(postService.getById(id));
     }
 
     @PostMapping
     @Operation(summary = "Create a new post")
     public ResponseEntity<Post> create(@RequestBody CreatePostRequest request) {
-        return postService.create(request)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        Post createdPost = postService.create(request);
+        return ResponseEntity
+                .created(URI.create("/v1/posts/" + createdPost.getId()))
+                .body(createdPost);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing post")
     public ResponseEntity<Post> update(@PathVariable UUID id, @RequestBody UpdatePostRequest request) {
-        return postService.update(id, request)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        return ResponseEntity.ok(postService.update(id, request));
     }
 
     @PatchMapping("/{id}")
     @Operation(summary = "Update a sub property of an existing post")
     public ResponseEntity<Post> patch(@PathVariable UUID id, @RequestBody PatchPostRequest request) {
-        return postService.patchContent(id, request)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(postService.patchContent(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete an existing post")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        if (!postService.deleteById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable UUID id) {
+        postService.deleteById(id);
     }
 }

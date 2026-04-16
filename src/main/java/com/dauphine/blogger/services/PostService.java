@@ -7,19 +7,18 @@ import com.dauphine.blogger.models.Post;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface PostService {
     List<Post> getAll(LocalDate date, String value);
 
-    Optional<Post> getById(UUID id);
+    Post getById(UUID id);
 
-    Optional<Post> create(CreatePostRequest request);
+    Post create(CreatePostRequest request);
 
-    Optional<Post> update(UUID id, UpdatePostRequest request);
+    Post update(UUID id, UpdatePostRequest request);
 
-    Optional<Post> patchContent(UUID id, PatchPostRequest request);
+    Post patchContent(UUID id, PatchPostRequest request);
 
-    boolean deleteById(UUID id);
+    void deleteById(UUID id);
 }
