@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> getAll(String name) {
         if (name != null && !name.isBlank()) {
-            return repository.findByNameContainingIgnoreCaseOrderByNameAsc(name.trim());
+            return repository.findAllLikeName(name.trim());
         }
         return repository.findAll();
     }

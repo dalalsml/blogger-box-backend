@@ -27,13 +27,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> getAll(LocalDate date) {
-        if (date == null) {
+    public List<Post> getAll(LocalDate date, String value) {
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (date != null) {
+            start = date.atStartOfDay();
+            end = date.plusDays(1).atStartOfDay();
+        }
+
+        String sanitizedValue = (value == null || value.isBlank()) ? null : value.trim();
+
+        if (start == null && sanitizedValue == null) {
             return postRepository.findAllByOrderByCreatedDateDesc();
         }
-        LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
-        return postRepository.findByCreatedDateBetweenOrderByCreatedDateDesc(start, end);
+
+        return postRepository.searchByValueAndDate(sanitizedValue, start, end);
     }
 
     @Override

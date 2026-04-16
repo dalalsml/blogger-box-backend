@@ -34,11 +34,12 @@ public class PostController {
     }
 
     @GetMapping
-    @Operation(summary = "Retrieve all posts ordered by creation date")
+    @Operation(summary = "Retrieve all posts ordered by creation date or filter by date/value")
     public List<Post> getAll(
             @RequestParam(required = false)
-            @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) {
-        return postService.getAll(date);
+            @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date,
+            @RequestParam(required = false) String value) {
+        return postService.getAll(date, value);
     }
 
     @GetMapping("/{id}")

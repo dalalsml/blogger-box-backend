@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface PostService {
-    List<Post> getAll(LocalDate date);
+    List<Post> getAll(LocalDate date, String value);
 
     Optional<Post> getById(UUID id);
 
