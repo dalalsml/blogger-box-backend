@@ -43,20 +43,38 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Optional<Post> create(CreatePostRequest request) {
+        if (request == null || request.getCategoryId() == null) {
+            return Optional.empty();
+        }
+        if (request.getTitle() == null || request.getTitle().isBlank()
+                || request.getContent() == null || request.getContent().isBlank()) {
+            return Optional.empty();
+        }
         return categoryRepository.findById(request.getCategoryId())
-                .map(category -> postRepository.save(new Post(request.getTitle(), request.getContent(), category)));
+                .map(category -> postRepository.save(new Post(
+                        request.getTitle().trim(),
+                        request.getContent().trim(),
+                        category
+                )));
     }
 
     @Override
     public Optional<Post> update(UUID id, UpdatePostRequest request) {
+        if (request == null || request.getCategoryId() == null) {
+            return Optional.empty();
+        }
+        if (request.getTitle() == null || request.getTitle().isBlank()
+                || request.getContent() == null || request.getContent().isBlank()) {
+            return Optional.empty();
+        }
         Optional<Category> category = categoryRepository.findById(request.getCategoryId());
         if (category.isEmpty()) {
             return Optional.empty();
         }
         return postRepository.findById(id)
                 .map(post -> {
-                    post.setTitle(request.getTitle());
-                    post.setContent(request.getContent());
+                    post.setTitle(request.getTitle().trim());
+                    post.setContent(request.getContent().trim());
                     post.setCategory(category.get());
                     return postRepository.save(post);
                 });

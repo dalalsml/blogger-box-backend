@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,8 +33,8 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<Category> getAll() {
-        return service.getAll();
+    public List<Category> getAll(@RequestParam(required = false) String name) {
+        return service.getAll(name);
     }
 
     @GetMapping("/{id}")
@@ -47,7 +48,11 @@ public class CategoryController {
     @PostMapping
     @Operation(summary = "Create a new category")
     public ResponseEntity<Category> create(@RequestBody CategoryRequest request) {
-        return ResponseEntity.ok(service.create(request.getName()));
+        try {
+            return ResponseEntity.ok(service.create(request.getName()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")

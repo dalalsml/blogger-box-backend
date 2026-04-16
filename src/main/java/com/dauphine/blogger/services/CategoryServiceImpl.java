@@ -23,7 +23,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAll() {
+    public List<Category> getAll(String name) {
+        if (name != null && !name.isBlank()) {
+            return repository.findByNameContainingIgnoreCaseOrderByNameAsc(name.trim());
+        }
         return repository.findAll();
     }
     
@@ -34,15 +37,21 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public Category create(String name) {
-        Category category = new Category(name);
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Category name is required");
+        }
+        Category category = new Category(name.trim());
         return repository.save(category);
     }
     
     @Override
     public Optional<Category> updateName(UUID id, String name) {
+        if (name == null || name.isBlank()) {
+            return Optional.empty();
+        }
         return repository.findById(id)
                 .map(category -> {
-                    category.setName(name);
+                    category.setName(name.trim());
                     return repository.save(category);
                 });
     }
@@ -52,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
         return repository.findById(id)
                 .map(category -> {
                     if (name != null && !name.isBlank()) {
-                        category.setName(name);
+                        category.setName(name.trim());
                     }
                     return repository.save(category);
                 });

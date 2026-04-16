@@ -9,7 +9,7 @@ import java.util.UUID;
 import com.dauphine.blogger.models.Category;
 
 public interface CategoryService {
-    List<Category> getAll();
+    List<Category> getAll(String name);
     Optional<Category> getById(UUID id);
     Category create(String name);
     Optional<Category> updateName(UUID id, String name);

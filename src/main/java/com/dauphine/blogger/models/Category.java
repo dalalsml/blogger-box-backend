@@ -3,6 +3,7 @@ package com.dauphine.blogger.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import java.util.UUID;
@@ -12,10 +13,10 @@ import java.util.UUID;
 public class Category {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "name", length = 100)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
     public Category() {
@@ -27,8 +28,14 @@ public class Category {
     }
 
     public Category(String name) {
-        this.id = UUID.randomUUID();
         this.name = name;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (id == null) {
+            id = UUID.randomUUID();
+        }
     }
 
     public UUID getId() {
