@@ -19,13 +19,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.UUID;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/v1/categories")
+@RequestMapping({"/v1/categories", "/api/v1/categories", "/api/categories"})
 @Tag(name = "Categories API", description = "CRUD endpoints for categories")
 public class CategoryController {
 
@@ -51,8 +52,13 @@ public class CategoryController {
     @Operation(summary = "Create a new category")
     public ResponseEntity<Category> create(@RequestBody CategoryRequest request) {
         Category createdCategory = service.create(request.getName());
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdCategory.getId())
+                .toUri();
         return ResponseEntity
-                .created(URI.create("/v1/categories/" + createdCategory.getId()))
+                .created(location)
                 .body(createdCategory);
     }
 

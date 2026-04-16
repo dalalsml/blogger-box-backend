@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.UUID;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/v1/posts")
+@RequestMapping({"/v1/posts", "/api/v1/posts", "/api/posts"})
 @Tag(name = "Posts API", description = "CRUD endpoints for posts")
 public class PostController {
 
@@ -54,8 +55,13 @@ public class PostController {
     @Operation(summary = "Create a new post")
     public ResponseEntity<Post> create(@RequestBody CreatePostRequest request) {
         Post createdPost = postService.create(request);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdPost.getId())
+                .toUri();
         return ResponseEntity
-                .created(URI.create("/v1/posts/" + createdPost.getId()))
+                .created(location)
                 .body(createdPost);
     }
 

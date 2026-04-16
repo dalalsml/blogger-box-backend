@@ -2,6 +2,7 @@ package com.dauphine.blogger.exceptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
 
@@ -20,9 +22,10 @@ public class GlobalDefaultExceptionHandler {
 
     @ExceptionHandler({
             CategoryNotFoundByIdException.class,
-            PostNotFoundByIdException.class
+            PostNotFoundByIdException.class,
+            NoResourceFoundException.class
     })
-    public ResponseEntity<ErrorResponse> handleNotFoundException(RuntimeException ex) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException(Exception ex) {
         logger.warn("[NOT FOUND] {}", ex.getMessage());
         return build(HttpStatus.NOT_FOUND, ex.getMessage());
     }
@@ -42,6 +45,12 @@ public class GlobalDefaultExceptionHandler {
     public ResponseEntity<ErrorResponse> handleServiceUnavailable(DataAccessResourceFailureException ex) {
         logger.error("[SERVICE UNAVAILABLE] {}", ex.getMessage(), ex);
         return build(HttpStatus.SERVICE_UNAVAILABLE, "Database is temporarily unavailable");
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(DataIntegrityViolationException ex) {
+        logger.warn("[CONFLICT] {}", ex.getMessage(), ex);
+        return build(HttpStatus.CONFLICT, "Operation conflicts with existing data");
     }
 
     @ExceptionHandler(Exception.class)
