@@ -18,7 +18,7 @@ public class Post {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "title")
+    @Column(name = "title", length = 500)
     private String title;
 
     @Column(name = "content")
